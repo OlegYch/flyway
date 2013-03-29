@@ -25,6 +25,7 @@ import com.googlecode.flyway.core.dbsupport.JdbcTemplate;
  * Adapter for executing migrations implementing JdbcMigration.
  */
 public class JdbcMigrationExecutor implements MigrationExecutor {
+  public static Runnable hook = null;
     /**
      * The JdbcMigration to execute.
      */
@@ -40,6 +41,9 @@ public class JdbcMigrationExecutor implements MigrationExecutor {
     }
 
     public void execute(JdbcTemplate jdbcTemplate, DbSupport dbSupport) {
+      if (hook != null) {
+        hook.run();
+      }
         try {
             jdbcMigration.migrate(jdbcTemplate.getConnection());
         } catch (Exception e) {

@@ -16,9 +16,9 @@
 package com.googlecode.flyway.core.resolver.sql;
 
 import com.googlecode.flyway.core.dbsupport.DbSupport;
+import com.googlecode.flyway.core.dbsupport.JdbcTemplate;
 import com.googlecode.flyway.core.dbsupport.SqlScript;
 import com.googlecode.flyway.core.resolver.MigrationExecutor;
-import com.googlecode.flyway.core.dbsupport.JdbcTemplate;
 import com.googlecode.flyway.core.util.PlaceholderReplacer;
 import com.googlecode.flyway.core.util.Resource;
 
@@ -26,6 +26,7 @@ import com.googlecode.flyway.core.util.Resource;
  * Database migration based on a sql file.
  */
 public class SqlMigrationExecutor implements MigrationExecutor {
+  public static Runnable hook = null;
     /**
      * The placeholder replacer to apply to sql migration scripts.
      */
@@ -57,6 +58,9 @@ public class SqlMigrationExecutor implements MigrationExecutor {
     }
 
     public void execute(JdbcTemplate jdbcTemplate, DbSupport dbSupport) {
+      if (hook != null) {
+        hook.run();
+      }
         String sqlScriptSource = sqlScriptResource.loadAsString(encoding);
         String sqlScriptSourceNoPlaceholders = placeholderReplacer.replacePlaceholders(sqlScriptSource);
         SqlScript sqlScript = new SqlScript(sqlScriptSourceNoPlaceholders, dbSupport);
